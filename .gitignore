@@ -12,6 +12,7 @@ ENV/
 # Environment variables / secrets
 .env
 .env.*
+!.env.example
 secrets.json
 secret_key.txt
 local_settings.py
@@ -22,7 +23,7 @@ settings_local.py
 *.sqlite3-journal
 
 # User uploads / media
-/media/
+media/
 
 # Static build output
 staticfiles/
@@ -69,5 +70,5 @@ coverage.xml
 
 # Txt files
 *.txt
+!requirements.txt
 
-db.sqlite3
