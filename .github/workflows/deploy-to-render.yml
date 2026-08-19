@@ -1,0 +1,47 @@
+name: CI and Deploy to Render
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install --upgrade pip && pip install -r requirements.txt
+
+      - name: Run migrations (skip if no DB in CI)
+        run: |
+          if [ -n "${{ secrets.DATABASE_URL }}" ]; then
+            python manage.py migrate --noinput
+          else
+            echo "No DATABASE_URL set; skipping migrate"
+          fi
+
+      - name: Run tests
+        run: |
+          if [ -n "${{ secrets.DATABASE_URL }}" ]; then
+            python manage.py test
+          else
+            echo "No DATABASE_URL set; skipping tests that require DB"
+          fi
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy webhook
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_WEBHOOK }}" ]; then
+            echo "RENDER_DEPLOY_WEBHOOK secret not set — skipping deploy"
+            exit 0
+          fi
+          curl -X POST -H 'Content-Type: application/json' -d '{}' "${{ secrets.RENDER_DEPLOY_WEBHOOK }}"

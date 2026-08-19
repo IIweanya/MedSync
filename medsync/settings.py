@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import dj_database_url
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,14 +15,14 @@ SECRET_KEY = os.getenv(
     'SECRET_KEY'
 )
 
-DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [
-    h.strip() 
+    h.strip()
     for h in os.getenv(
-        'ALLOWED_HOSTS', 
-        'localhost,127.0.0.1'
-    ).split(',') 
+        'ALLOWED_HOSTS',
+        os.getenv('RENDER_EXTERNAL_HOSTNAME', 'localhost')
+    ).split(',')
     if h.strip()
 ]
 
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -96,6 +98,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

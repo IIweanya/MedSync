@@ -1,0 +1,33 @@
+# Render service definition (template). Before using, replace placeholders
+# (REPO, region, and any env values) in the Render dashboard or via the CLI.
+
+services:
+  - type: web
+    name: medsync-web
+    env: python
+    plan: free
+    # Build: install deps and collect static files
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn medsync.wsgi --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        # Set this in the dashboard; do NOT commit a real secret here.
+        value: "REPLACE_ME_WITH_SECRET"
+      - key: ALLOWED_HOSTS
+        value: "REPLACE_WITH_YOUR_RENDER_HOST"
+
+databases:
+  - name: medsync-db
+    plan: starter
+    postgresVersion: 14
+
+# Notes:
+# - After creating the DB on Render, set the `DATABASE_URL` env var for the
+#   web service to the connection string provided by the database instance.
+# - Set `SECRET_KEY`, email settings (EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD,
+#   DEFAULT_FROM_EMAIL) and any other environment-specific variables in the
+#   Render dashboard.
+# - For media uploads, either attach a Persistent Disk to the web service or
+#   configure S3-compatible storage and set the corresponding env vars.
