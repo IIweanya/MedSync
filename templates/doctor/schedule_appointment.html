@@ -1,0 +1,89 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Schedule Appointment — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/doctor_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/doctor_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-5">
+  <div class="flex items-center gap-3">
+    <a href="{% url 'doctor_appointments' %}" class="text-gray-400 hover:text-gray-600">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    </a>
+    <h1 class="text-xl font-bold text-gray-900">Schedule Appointment</h1>
+  </div>
+
+  <div class="card p-6 rounded-xl">
+    <form method="post" novalidate class="space-y-5">
+      {% csrf_token %}
+      <!-- Patient -->
+      <div>
+        <label class="form-label">Patient</label>
+        <select name="patient" class="form-select">
+          <option value="">Select a patient…</option>
+          {% for patient in patients %}
+          <option value="{{ patient.pk }}" {% if form.patient.value == patient.pk|stringformat:"s" %}selected{% endif %}>
+            {{ patient.full_name }} — {{ patient.email }}
+          </option>
+          {% endfor %}
+        </select>
+        {% if form.patient.errors %}<p class="text-xs text-red-500 mt-1">{{ form.patient.errors.0 }}</p>{% endif %}
+      </div>
+
+      <!-- Appointment Type -->
+      <div>
+        <label class="form-label">Appointment Type</label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {% for val, label in form.fields.appointment_type.choices %}
+          <label class="flex items-center gap-2 p-3 rounded-xl border border-gray-200 cursor-pointer hover:border-primary-300 hover:bg-primary-50 transition-all has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+            <input type="radio" name="appointment_type" value="{{ val }}" class="accent-primary-600"
+              {% if form.appointment_type.value == val or not form.appointment_type.value and val == 'consultation' %}checked{% endif %} />
+            <span class="text-sm text-gray-700 font-medium">{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Date and Time -->
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Date</label>
+          <input type="date" name="date" value="{{ form.date.value|default:'' }}" class="form-input" required />
+          {% if form.date.errors %}<p class="text-xs text-red-500 mt-1">{{ form.date.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="form-label">Start Time</label>
+          <input type="time" name="start_time" value="{{ form.start_time.value|default:'' }}" class="form-input" required />
+          {% if form.start_time.errors %}<p class="text-xs text-red-500 mt-1">{{ form.start_time.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+      <div>
+        <label class="form-label">End Time</label>
+        <input type="time" name="end_time" value="{{ form.end_time.value|default:'' }}" class="form-input" />
+        <p class="text-xs text-gray-400 mt-1">Leave blank to use your default appointment duration.</p>
+        {% if form.end_time.errors %}<p class="text-xs text-red-500 mt-1">{{ form.end_time.errors.0 }}</p>{% endif %}
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label class="form-label">Notes <span class="text-gray-400 font-normal">(optional)</span></label>
+        <textarea name="notes" rows="3" placeholder="Any instructions or notes for this appointment…" class="form-textarea resize-none">{{ form.notes.value|default:'' }}</textarea>
+      </div>
+
+      {% if form.non_field_errors %}
+      <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+        {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary flex-1 justify-center py-2.5">
+          <i data-lucide="calendar-plus" class="w-4 h-4"></i> Schedule Appointment
+        </button>
+        <a href="{% url 'doctor_appointments' %}" class="btn-secondary px-5">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

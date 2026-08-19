@@ -1,0 +1,75 @@
+{% comment %}
+   Resend button with a live cooldown countdown.
+
+   The server owns the limit — EmailVerification.can_resend() is what actually
+   refuses an early request. This is presentation only: it tells the user how long
+   they have to wait instead of letting them press a button that will silently do
+   nothing. Someone with dev tools can re-enable the button early and still be
+   refused server-side.
+
+   Usage: {% include "partials/resend_countdown.html" with retry_after=retry_after email=email %}
+
+   `email` is optional; when present it is posted as a fallback for the case where
+   the session no longer identifies the account.
+{% endcomment %}
+<form method="post" action="{% url 'accounts:resend_verification' %}">
+  {% csrf_token %}
+  {% if email %}<input type="hidden" name="email" value="{{ email }}" />{% endif %}
+  {% comment %}
+    `disabled` is rendered server-side, not left to JS, so the button is never
+    briefly clickable and teal before the script runs. .btn-primary's disabled:
+    styles turn the background grey while leaving the label white; JS clears the
+    attribute when the countdown reaches zero and the original colour returns.
+  {% endcomment %}
+  <button type="submit"
+          class="btn-primary btn-block"
+          data-resend-button
+          data-retry-after="{{ retry_after|default:0 }}"
+          data-label-ready="Resend Verification Email"
+          {% if retry_after %}disabled{% endif %}>
+    <i data-lucide="send" class="w-4 h-4"></i>
+    <span data-resend-label>
+      {% if retry_after %}Resend available in {{ retry_after }}s{% else %}Resend Verification Email{% endif %}
+    </span>
+  </button>
+  {# aria-live so the remaining time is announced, not just shown. #}
+  <p class="form-hint text-center" data-resend-status role="status" aria-live="polite"></p>
+</form>
+
+<script>
+(() => {
+  const btn = document.querySelector('[data-resend-button]');
+  if (!btn) return;
+  const label = btn.querySelector('[data-resend-label]');
+  const status = document.querySelector('[data-resend-status]');
+  const ready = btn.dataset.labelReady || 'Resend Verification Email';
+  let remaining = parseInt(btn.dataset.retryAfter || '0', 10);
+
+  if (!Number.isFinite(remaining) || remaining <= 0) return;
+
+  const release = () => {
+    // Dropping the attribute is what restores the teal background — the colour is
+    // driven purely by :disabled, so nothing has to be un-set by hand.
+    btn.disabled = false;
+    label.textContent = ready;
+    if (status) status.textContent = 'You can request another verification email now.';
+  };
+
+  const tick = () => {
+    if (remaining <= 0) return release();
+    label.textContent = `Resend available in ${remaining}s`;
+    if (status) {
+      // Announce sparingly: every second would make a screen reader unusable.
+      status.textContent = remaining % 15 === 0
+        ? `${remaining} seconds until you can resend.` : '';
+    }
+    remaining -= 1;
+    window.setTimeout(tick, 1000);
+  };
+
+  // Already disabled server-side; set it again so the countdown also works if this
+  // partial is ever rendered without that attribute.
+  btn.disabled = true;
+  tick();
+})();
+</script>

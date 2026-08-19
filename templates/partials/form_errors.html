@@ -1,0 +1,19 @@
+{% comment %}
+   Form-level error summary. Shown above the fields for errors that belong to the
+   form as a whole rather than one input — a bad credential pair, say.
+
+   Field-level errors never come through here; they render in each field's own
+   message slot so the message sits directly under the input it refers to
+   (req1 §9).
+
+   Usage: {% include "partials/form_errors.html" with form=form %}
+{% endcomment %}
+{% if form.non_field_errors %}
+  <div class="flex items-start gap-2.5 p-3.5 bg-red-50 border border-red-200 rounded-lg"
+       role="alert">
+    <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5"></i>
+    <div class="text-sm text-red-700 space-y-1">
+      {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+    </div>
+  </div>
+{% endif %}

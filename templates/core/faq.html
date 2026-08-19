@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}FAQ — MedSync{% endblock %}
+{% block body %}
+
+{% include "partials/public_nav.html" %}
+
+<section class="bg-gradient-to-br from-primary-50 via-white to-teal-50 py-14">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Frequently asked questions</h1>
+    <p class="text-lg text-gray-600">Everything you need to know about using MedSync.</p>
+  </div>
+</section>
+
+<section class="py-14 bg-white">
+  <div class="max-w-3xl mx-auto px-6 space-y-10">
+
+    {% comment %}
+      Data-driven so each group renders identically and a new question is one list
+      entry rather than another copy of the markup.
+    {% endcomment %}
+    {% for group in faq_groups %}
+      <div>
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{{ group.title }}</h2>
+        <div class="space-y-3">
+          {% for item in group.items %}
+            {% comment %}
+              <details> gives keyboard support, focus handling and open/closed
+              semantics for free — no JS, and it works before scripts load.
+            {% endcomment %}
+            <details class="card rounded-xl overflow-hidden group">
+              <summary class="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none
+                              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-inset">
+                <span class="text-sm font-semibold text-gray-900">{{ item.q }}</span>
+                <i data-lucide="chevron-down"
+                   class="w-4 h-4 text-gray-400 flex-shrink-0 transition-transform group-open:rotate-180"></i>
+              </summary>
+              <div class="px-5 pb-4 text-sm text-gray-600 leading-relaxed">{{ item.a }}</div>
+            </details>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+  </div>
+</section>
+
+<section class="py-14 bg-gray-50 border-t border-gray-100">
+  <div class="max-w-2xl mx-auto px-6 text-center">
+    <h2 class="text-2xl font-bold text-gray-900 mb-3">Didn't find your answer?</h2>
+    <p class="text-gray-600 mb-7">Send us a message and we'll get back to you.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{% url 'core:contact' %}" class="btn-primary">Contact Us</a>
+      <a href="{% url 'core:how_it_works' %}" class="btn-secondary">How It Works</a>
+    </div>
+  </div>
+</section>
+
+{% include "partials/public_footer.html" %}
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Availability — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/doctor_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/doctor_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+  <h1 class="text-xl font-bold text-gray-900">Availability</h1>
+
+  <!-- Weekly availability -->
+  <div class="card p-6 rounded-xl">
+    <h2 class="font-semibold text-gray-900 mb-1">Weekly Schedule</h2>
+    <p class="text-sm text-gray-500 mb-5">Set your regular working hours. Toggle days on or off.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="action" value="save_weekly" />
+      <div class="space-y-3">
+        {% for day in days %}
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-gray-50 rounded-xl" id="day-row-{{ day.index }}">
+          <!-- Toggle + name -->
+          <div class="flex items-center gap-3 w-36 flex-shrink-0">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" name="active_{{ day.index }}" id="toggle-{{ day.index }}"
+                {% if day.avail and day.avail.is_active %}checked{% endif %}
+                class="sr-only peer" onchange="toggleDay({{ day.index }})" />
+              <div class="w-10 h-5 bg-gray-200 peer-checked:bg-primary-500 rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:w-4 after:h-4 after:transition-all peer-checked:after:translate-x-5"></div>
+            </label>
+            <span class="text-sm font-medium text-gray-800 w-24">{{ day.name }}</span>
+          </div>
+          <!-- Times -->
+          <div class="flex items-center gap-2 flex-1" id="times-{{ day.index }}" {% if not day.avail or not day.avail.is_active %}style="opacity:.4;pointer-events:none"{% endif %}>
+            <input type="time" name="start_{{ day.index }}"
+              value="{{ day.avail.start_time|time:'H:i'|default:'09:00' }}"
+              class="form-input !w-auto text-sm" />
+            <span class="text-gray-400 text-sm">to</span>
+            <input type="time" name="end_{{ day.index }}"
+              value="{{ day.avail.end_time|time:'H:i'|default:'17:00' }}"
+              class="form-input !w-auto text-sm" />
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="mt-5">
+        <button type="submit" class="btn-primary">
+          <i data-lucide="save" class="w-4 h-4"></i> Save Schedule
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Block time off -->
+  <div class="card p-6 rounded-xl">
+    <h2 class="font-semibold text-gray-900 mb-1">Block Time Off</h2>
+    <p class="text-sm text-gray-500 mb-5">Block specific dates or time ranges when you're unavailable.</p>
+    <form method="post" novalidate class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="add_exception" />
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Date</label>
+          <input type="date" name="date" class="form-input" required />
+        </div>
+        <div>
+          <label class="form-label">Reason <span class="text-gray-400 font-normal">(optional)</span></label>
+          <input type="text" name="reason" placeholder="e.g. Conference, Holiday" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Start Time <span class="text-gray-400 font-normal">(blank = full day)</span></label>
+          <input type="time" name="start_time" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">End Time</label>
+          <input type="time" name="end_time" class="form-input" />
+        </div>
+      </div>
+      <button type="submit" class="btn-secondary">
+        <i data-lucide="plus" class="w-4 h-4"></i> Add Block
+      </button>
+    </form>
+  </div>
+
+  <!-- Existing exceptions -->
+  {% if exceptions %}
+  <div class="card rounded-xl overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-50">
+      <h2 class="font-semibold text-gray-900">Blocked Dates</h2>
+    </div>
+    <div class="divide-y divide-gray-50">
+      {% for exc in exceptions %}
+      <div class="flex items-center gap-4 px-5 py-3.5">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-800">{{ exc.date|date:"l, F j, Y" }}</p>
+          <p class="text-xs text-gray-500">
+            {% if exc.is_full_day %}Full day
+            {% else %}{{ exc.start_time|time:"g:i A" }} – {{ exc.end_time|time:"g:i A" }}{% endif %}
+            {% if exc.reason %} · {{ exc.reason }}{% endif %}
+          </p>
+        </div>
+        <form method="post" action="{% url 'delete_exception' exc.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="text-red-400 hover:text-red-600 transition-colors p-1.5 rounded-lg hover:bg-red-50">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+  function toggleDay(n) {
+    const checked = document.getElementById('toggle-' + n).checked;
+    const times = document.getElementById('times-' + n);
+    times.style.opacity = checked ? '1' : '0.4';
+    times.style.pointerEvents = checked ? '' : 'none';
+  }
+</script>
+{% endblock %}
+{% endblock %}

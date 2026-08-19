@@ -1,0 +1,136 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Book Appointment — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/patient_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/patient_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-5">
+  <div class="flex items-center gap-3">
+    <a href="{% url 'find_doctor' %}" class="text-gray-400 hover:text-gray-600">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    </a>
+    <h1 class="text-xl font-bold text-gray-900">Book Appointment</h1>
+  </div>
+
+  <!-- Doctor card summary -->
+  <div class="card p-4 rounded-xl flex items-center gap-4">
+    {% if doctor.get_photo_url %}
+      <img src="{{ doctor.get_photo_url }}" alt="{{ doctor.display_name }}" class="w-14 h-14 rounded-full object-cover flex-shrink-0" />
+    {% else %}
+      <div class="w-14 h-14 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+        <span class="text-xl font-bold text-primary-700">{{ doctor.full_name|first|upper }}</span>
+      </div>
+    {% endif %}
+    <div>
+      <h2 class="font-semibold text-gray-900">{{ doctor.display_name }}</h2>
+      <p class="text-sm text-primary-600">{{ doctor.doctor_profile.get_specialty_display }}</p>
+      {% if doctor.doctor_profile.location %}<p class="text-xs text-gray-500">{{ doctor.doctor_profile.location }}</p>{% endif %}
+    </div>
+  </div>
+
+  <!-- Booking form -->
+  <div class="card p-6 rounded-xl">
+    <form method="post" novalidate class="space-y-6">
+      {% csrf_token %}
+
+      <!-- Step 1: Type -->
+      <div>
+        <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-bold">1</span>
+          Choose Appointment Type
+        </h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {% for val, label in appointment_types %}
+          <label class="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-200 cursor-pointer hover:border-teal-300 hover:bg-teal-50 transition-all has-[:checked]:border-teal-500 has-[:checked]:bg-teal-50 text-center">
+            <input type="radio" name="appointment_type" value="{{ val }}" class="sr-only" />
+            <i data-lucide="{% if val == 'video' %}video{% elif val == 'in_person' %}map-pin{% elif val == 'checkup' %}stethoscope{% elif val == 'follow_up' %}refresh-cw{% else %}clipboard{% endif %}" class="w-5 h-5 text-teal-600"></i>
+            <span class="text-xs font-medium text-gray-700 leading-tight">{{ label }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Step 2: Date -->
+      <div>
+        <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-bold">2</span>
+          Choose Date
+        </h3>
+        <input type="date" name="date" id="date-picker" value="{{ selected_date }}"
+          min="{% now 'Y-m-d' %}"
+          class="form-input max-w-xs"
+          onchange="this.form.submit(); return false;"
+          required />
+        <p class="text-xs text-gray-400 mt-1">Select a date to see available times.</p>
+      </div>
+
+      <!-- Step 3: Time -->
+      {% if selected_date %}
+      <div>
+        <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-bold">3</span>
+          Choose Time
+        </h3>
+        {% if available_slots %}
+        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          {% for slot in available_slots %}
+          <label class="flex items-center justify-center py-2.5 rounded-xl border border-gray-200 cursor-pointer hover:border-teal-400 hover:bg-teal-50 transition-all has-[:checked]:border-teal-500 has-[:checked]:bg-teal-500 has-[:checked]:text-white text-sm font-medium text-gray-700">
+            <input type="radio" name="start_time" value="{{ slot }}" class="sr-only" />
+            {{ slot }}
+          </label>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-4 bg-orange-50 border border-orange-100 rounded-xl text-center">
+          <i data-lucide="clock-x" class="w-6 h-6 text-orange-400 mx-auto mb-2"></i>
+          <p class="text-sm font-medium text-orange-700">No available slots for this date</p>
+          <p class="text-xs text-orange-500 mt-1">Please choose another date.</p>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Step 4: Notes -->
+      <div>
+        <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-xs font-bold">4</span>
+          Notes <span class="text-gray-400 font-normal text-xs">(optional)</span>
+        </h3>
+        <textarea name="notes" rows="3" placeholder="Any symptoms, questions, or notes for the doctor…" class="form-textarea resize-none"></textarea>
+      </div>
+
+      <!-- Hidden date for form submission -->
+      <input type="hidden" name="date" value="{{ selected_date }}" id="date-hidden" />
+
+      {% if selected_date and available_slots %}
+      <button type="submit" class="btn-primary btn-block">
+        <i data-lucide="check-circle" class="w-5 h-5"></i> Confirm Appointment
+      </button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+  // When date changes, reload the page with the new date as a query param
+  document.getElementById('date-picker').addEventListener('change', function() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('date', this.value);
+    url.searchParams.set('step', '3');
+    window.location.href = url.toString();
+  });
+
+  // Highlight selected type visually
+  document.querySelectorAll('input[name="appointment_type"]').forEach(input => {
+    input.addEventListener('change', () => {
+      document.querySelectorAll('label:has(input[name="appointment_type"])').forEach(l =>
+        l.classList.remove('border-teal-500', 'bg-teal-50')
+      );
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

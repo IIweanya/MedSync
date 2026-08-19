@@ -1,0 +1,46 @@
+{% extends "emails/base_email.html" %}
+{% block subject %}Verify your MedSync email address{% endblock %}
+{% block preheader %}Confirm your email address to activate your MedSync account.{% endblock %}
+
+{% block content %}
+  <h1 style="margin:0 0 16px 0;font-size:20px;font-weight:600;color:#0f172a;">Verify your email address</h1>
+
+  <p style="margin:0 0 16px 0;">Hello {{ user.full_name }},</p>
+
+  <p style="margin:0 0 16px 0;">
+    Welcome to MedSync. Please confirm this email address to activate your
+    {{ role_label }} account.
+  </p>
+
+  <!-- Button. Table-wrapped rather than a styled <a>, so Outlook renders the
+       background colour instead of dropping it. -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
+    <tr>
+      <td align="center" style="background-color:#0d9488;border-radius:8px;">
+        <a href="{{ verification_url }}"
+           style="display:inline-block;padding:13px 28px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;">
+          Verify Email Address
+        </a>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 8px 0;font-size:13px;color:#6b7280;">
+    Or paste this link into your browser:
+  </p>
+  <p style="margin:0 0 20px 0;font-size:13px;word-break:break-all;">
+    <a href="{{ verification_url }}" style="color:#0d9488;">{{ verification_url }}</a>
+  </p>
+
+  <p style="margin:0;font-size:13px;color:#6b7280;">
+    This link expires in {{ expiry_hours }} hours. You can request a new one from the
+    sign-in page at any time.
+  </p>
+{% endblock %}
+
+{% block footer_extra %}
+  <p style="margin:0 0 8px 0;">
+    If you didn’t create a MedSync account, you can safely ignore this email — no
+    account will be activated without this confirmation.
+  </p>
+{% endblock %}

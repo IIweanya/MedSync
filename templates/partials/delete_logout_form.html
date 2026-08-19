@@ -1,0 +1,8 @@
+<form method="post" action="{% url 'accounts:delete_account' %}"
+      onsubmit="return confirm('Delete your account and logout? This cannot be undone.');"
+      class="inline">
+  {% csrf_token %}
+  <button type="submit" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors">
+    <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+  </button>
+</form>

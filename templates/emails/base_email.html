@@ -1,0 +1,55 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block subject %}MedSync{% endblock %}</title>
+</head>
+{% comment %}
+   Table layout and inline styles throughout: email clients strip <style> blocks
+   and have no flexbox/grid support, so none of the app's Tailwind classes apply
+   here. This template is intentionally standalone from base.html.
+{% endcomment %}
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <!-- Preheader: shown in inbox previews, hidden in the body. -->
+  <div style="display:none;font-size:1px;color:#f3f4f6;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">{% block preheader %}{% endblock %}</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4f6;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;background-color:#ffffff;border-radius:12px;border:1px solid #e5e7eb;overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:28px 32px 0 32px;">
+              <span style="font-size:20px;font-weight:700;color:#0f172a;letter-spacing:-0.01em;">
+                <span style="color:#0d9488;">Med</span>Sync
+              </span>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:24px 32px 32px 32px;color:#374151;font-size:15px;line-height:1.6;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 32px 28px 32px;border-top:1px solid #f3f4f6;color:#9ca3af;font-size:12px;line-height:1.6;">
+              {% block footer_extra %}{% endblock %}
+              <p style="margin:0 0 8px 0;">
+                Need help? Contact us at
+                <a href="mailto:{{ support_email }}" style="color:#0d9488;text-decoration:none;">{{ support_email }}</a>.
+              </p>
+              <p style="margin:0;">&copy; 2026 MedSync. All rights reserved.</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

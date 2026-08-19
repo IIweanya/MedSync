@@ -1,0 +1,24 @@
+{% extends "base_auth.html" %}
+{% block auth_title %}Login — MedSync{% endblock %}
+{% block auth_card %}
+<div class="card p-8 rounded-2xl shadow-lg text-center">
+  <img src="/static/images/medsync_logo.png" alt="MedSync" class="h-10 w-auto mx-auto mb-4" />
+  <h1 class="text-2xl font-bold text-gray-900 mb-2">Welcome back</h1>
+  <p class="text-sm text-gray-500 mb-8">Choose your account type to sign in</p>
+  <div class="grid grid-cols-2 gap-4">
+    <a href="{% url 'accounts:doctor_login' %}" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-gray-100 hover:border-primary-300 hover:bg-primary-50 transition-all group">
+      <div class="w-12 h-12 rounded-xl bg-primary-100 group-hover:bg-primary-200 flex items-center justify-center transition-colors">
+        <i data-lucide="stethoscope" class="w-6 h-6 text-primary-600"></i>
+      </div>
+      <span class="text-sm font-semibold text-gray-800">I'm a Doctor</span>
+    </a>
+    <a href="{% url 'accounts:patient_login' %}" class="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-gray-100 hover:border-teal-300 hover:bg-teal-50 transition-all group">
+      <div class="w-12 h-12 rounded-xl bg-teal-100 group-hover:bg-teal-200 flex items-center justify-center transition-colors">
+        <i data-lucide="user" class="w-6 h-6 text-teal-600"></i>
+      </div>
+      <span class="text-sm font-semibold text-gray-800">I'm a Patient</span>
+    </a>
+  </div>
+  <p class="text-sm text-gray-400 mt-6">New here? <a href="{% url 'accounts:patient_signup' %}" class="text-primary-600 font-medium hover:underline">Create an account</a></p>
+</div>
+{% endblock %}

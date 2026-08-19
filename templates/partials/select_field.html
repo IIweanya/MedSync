@@ -1,0 +1,30 @@
+{% comment %}
+   Select field — label, control, message slot. Uses .form-select so its height
+   and box match .form-input exactly (a <select> and an <input> do not agree on
+   intrinsic height, which is why the control height is set explicitly).
+
+   Usage:
+     {% include "partials/select_field.html" with id="specialty" name="specialty" label="Medical Specialty" choices=form.fields.specialty.choices selected=form.specialty.value errors=form.specialty.errors %}
+{% endcomment %}
+<div class="form-field">
+  <label for="{{ id }}" class="form-label">{{ label }}</label>
+  <select name="{{ name }}"
+          id="{{ id }}"
+          class="form-select{% if errors %} input-error{% endif %}"
+          {% if errors %}aria-invalid="true"{% endif %}
+          {% if errors or hint %}aria-describedby="{{ id }}-msg"{% endif %}
+          {% if required %}required{% endif %}>
+    {% if placeholder %}<option value="">{{ placeholder }}</option>{% endif %}
+    {% for opt_value, opt_label in choices %}
+      <option value="{{ opt_value }}" {% if selected == opt_value %}selected{% endif %}>{{ opt_label }}</option>
+    {% endfor %}
+  </select>
+  {% if errors %}
+    <p class="form-error" id="{{ id }}-msg">
+      <i data-lucide="alert-circle" class="w-3.5 h-3.5 flex-shrink-0 mt-px"></i>
+      <span>{{ errors.0 }}</span>
+    </p>
+  {% elif hint %}
+    <span class="form-hint" id="{{ id }}-msg">{{ hint }}</span>
+  {% endif %}
+</div>

@@ -1,0 +1,61 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Settings — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/patient_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/patient_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-5">
+  <h1 class="text-xl font-bold text-gray-900">Settings</h1>
+
+  <div class="card p-6 rounded-xl">
+    <h2 class="font-semibold text-gray-900 mb-1">Change Password</h2>
+    <p class="text-sm text-gray-500 mb-5">You will be logged out after changing your password.</p>
+    <form method="post" novalidate class="space-y-5">
+      {% csrf_token %}
+      {% include "partials/form_errors.html" with form=form %}
+
+      {% include "partials/password_field.html" with id="current_password" name="current_password" label="Current Password" autocomplete="current-password" errors=form.current_password.errors %}
+
+      {% include "partials/password_field.html" with id="new_password" name="new_password" label="New Password" autocomplete="new-password" errors=form.new_password.errors hint="At least 8 characters, not entirely numeric." %}
+
+      {% include "partials/password_field.html" with id="confirm_password" name="confirm_password" label="Confirm New Password" autocomplete="new-password" errors=form.confirm_password.errors %}
+
+      {% comment %}
+        No inline background override: .btn-primary is already teal-600 (#0d9488),
+        and an inline background also beats the hover:bg-teal-700 utility, which is
+        what made patient buttons stop reacting to hover while doctor ones did.
+      {% endcomment %}
+      <button type="submit" class="btn-primary">
+        <i data-lucide="lock" class="w-4 h-4"></i> Update Password
+      </button>
+    </form>
+  </div>
+
+  <div class="card p-6 rounded-xl">
+    <h2 class="font-semibold text-gray-900 mb-4">Account Information</h2>
+    <div class="space-y-3 text-sm">
+      <div class="flex justify-between py-2 border-b border-gray-50">
+        <span class="text-gray-500">Email</span>
+        <span class="font-medium text-gray-800">{{ request.user.email }}</span>
+      </div>
+      <div class="flex justify-between py-2 border-b border-gray-50">
+        <span class="text-gray-500">Role</span>
+        <span class="font-medium text-gray-800 capitalize">{{ request.user.role }}</span>
+      </div>
+      <div class="flex justify-between py-2">
+        <span class="text-gray-500">Member since</span>
+        <span class="font-medium text-gray-800">{{ request.user.date_joined|date:"F j, Y" }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6 rounded-xl">
+    <h2 class="font-semibold text-red-600 mb-2">Danger Zone</h2>
+    <a href="{% url 'accounts:confirm_delete' %}" class="btn-danger">
+      <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+    </a>
+  </div>
+</div>
+{% endblock %}

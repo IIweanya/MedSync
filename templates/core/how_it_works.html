@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}How It Works — MedSync{% endblock %}
+{% block body %}
+
+{% include "partials/public_nav.html" %}
+
+<section class="bg-gradient-to-br from-primary-50 via-white to-teal-50 py-16 lg:py-20">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-5">How MedSync works</h1>
+    <p class="text-lg text-gray-600 leading-relaxed">
+      Two short paths — one for doctors setting up a schedule, one for patients
+      booking into it.
+    </p>
+  </div>
+</section>
+
+<!-- Doctors -->
+<section class="py-16 bg-white">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="flex items-center gap-3 mb-8">
+      <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
+        <i data-lucide="stethoscope" class="w-5 h-5 text-primary-600"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900">For doctors</h2>
+    </div>
+
+    <ol class="space-y-5">
+      {% for step in "1234" %}
+      <li class="card p-5 rounded-xl flex gap-4">
+        <span class="w-8 h-8 rounded-full bg-primary-600 text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">{{ forloop.counter }}</span>
+        <div>
+          <p class="font-semibold text-gray-900">
+            {% if forloop.counter == 1 %}Create your account
+            {% elif forloop.counter == 2 %}Set your availability
+            {% elif forloop.counter == 3 %}Receive and manage bookings
+            {% else %}Track your history{% endif %}
+          </p>
+          <p class="text-sm text-gray-600 mt-1 leading-relaxed">
+            {% if forloop.counter == 1 %}Sign up with your specialty and professional ID, then confirm your email address.
+            {% elif forloop.counter == 2 %}Choose working days and hours, break periods, appointment length and buffer time. Block individual dates whenever you need to.
+            {% elif forloop.counter == 3 %}Appointments land on your dashboard and calendar. Confirm, reschedule, cancel with a reason, or mark a session complete.
+            {% else %}Every completed, cancelled, rescheduled and no-show session stays searchable, with the original and final times recorded.{% endif %}
+          </p>
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+
+    <div class="mt-7">
+      <a href="{% url 'accounts:doctor_signup' %}" class="btn-primary">
+        Get started as a doctor
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Patients -->
+<section class="py-16 bg-gray-50 border-y border-gray-100">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="flex items-center gap-3 mb-8">
+      <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
+        <i data-lucide="user" class="w-5 h-5 text-teal-600"></i>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900">For patients</h2>
+    </div>
+
+    <ol class="space-y-5">
+      {% for step in "1234" %}
+      <li class="card p-5 rounded-xl flex gap-4">
+        <span class="w-8 h-8 rounded-full bg-teal-600 text-white text-sm font-semibold flex items-center justify-center flex-shrink-0">{{ forloop.counter }}</span>
+        <div>
+          <p class="font-semibold text-gray-900">
+            {% if forloop.counter == 1 %}Create your account
+            {% elif forloop.counter == 2 %}Find your doctor
+            {% elif forloop.counter == 3 %}Pick a date and time
+            {% else %}Manage your appointments{% endif %}
+          </p>
+          <p class="text-sm text-gray-600 mt-1 leading-relaxed">
+            {% if forloop.counter == 1 %}Sign up with your name, email and date of birth, then confirm your email address.
+            {% elif forloop.counter == 2 %}Browse doctors by specialty and location, and see the consultation types each one offers.
+            {% elif forloop.counter == 3 %}Choose an appointment type, then pick from the slots the doctor actually has open — you'll never see one that's already taken.
+            {% else %}Reschedule or cancel from your dashboard, and keep your full history of past visits.{% endif %}
+          </p>
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+
+    <div class="mt-7">
+      <a href="{% url 'accounts:patient_signup' %}" class="btn-primary">
+        Get started as a patient
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-white">
+  <div class="max-w-2xl mx-auto px-6 text-center">
+    <h2 class="text-2xl font-bold text-gray-900 mb-3">Still have questions?</h2>
+    <p class="text-gray-600 mb-7">The FAQ covers the most common ones.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{% url 'core:faq' %}" class="btn-primary">Read the FAQ</a>
+      <a href="{% url 'core:contact' %}" class="btn-secondary">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+{% include "partials/public_footer.html" %}
+{% endblock %}

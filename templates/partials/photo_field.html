@@ -1,0 +1,89 @@
+{% comment %}
+   "Change Photo" control: file input, format guard, and live preview.
+
+   The `accept` attribute narrows the file picker but is not a control — it can be
+   overridden, and some pickers ignore it — so the real rule lives in
+   `PhotoValidationMixin.clean_photo`. This is here to say no immediately instead of
+   after a round trip, and to show the chosen image straight away.
+
+   Requires an element with `data-avatar-preview` to swap the picture into.
+
+   Usage: {% include "partials/photo_field.html" with errors=form.photo.errors %}
+{% endcomment %}
+<label class="btn-secondary cursor-pointer text-xs">
+  <i data-lucide="camera" class="w-3.5 h-3.5"></i> Change Photo
+  <input type="file" name="photo" id="photo"
+         accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+         class="hidden" data-photo-input />
+</label>
+
+<p class="form-error justify-center mt-2 hidden" data-photo-error role="alert">
+  <i data-lucide="alert-circle" class="w-3.5 h-3.5 flex-shrink-0 mt-px"></i>
+  <span data-photo-error-text></span>
+</p>
+
+{% if errors %}
+  <p class="form-error justify-center mt-2">
+    <i data-lucide="alert-circle" class="w-3.5 h-3.5 flex-shrink-0 mt-px"></i>
+    <span>{{ errors.0 }}</span>
+  </p>
+{% endif %}
+
+<script>
+(() => {
+  const input = document.querySelector('[data-photo-input]');
+  const error = document.querySelector('[data-photo-error]');
+  const errorText = document.querySelector('[data-photo-error-text]');
+  if (!input) return;
+
+  // Kept in step with PhotoValidationMixin in accounts/forms.py.
+  const ALLOWED_EXT = ['.jpg', '.jpeg', '.png'];
+  const MAX_BYTES = 5 * 1024 * 1024;
+  const FORMAT_MESSAGE = 'The profile image has to be in .jpg, .jpeg or .png format.';
+
+  const showError = (message) => {
+    if (!error || !errorText) { window.alert(message); return; }
+    errorText.textContent = message;
+    error.classList.remove('hidden');
+  };
+  const clearError = () => error && error.classList.add('hidden');
+
+  input.addEventListener('change', () => {
+    clearError();
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    const name = (file.name || '').toLowerCase();
+    if (!ALLOWED_EXT.some((ext) => name.endsWith(ext))) {
+      showError(FORMAT_MESSAGE);
+      // Clear the selection so a rejected file can't be submitted, and so picking
+      // the same file again still fires a change event.
+      input.value = '';
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      showError('That image is larger than 5 MB. Please choose a smaller file.');
+      input.value = '';
+      return;
+    }
+
+    // Accepted: show it immediately rather than waiting for the form to save.
+    const preview = document.querySelector('[data-avatar-preview]');
+    if (!preview) return;
+    const url = URL.createObjectURL(file);
+    if (preview.tagName === 'IMG') {
+      preview.src = url;
+    } else {
+      // Placeholder is an initials <div>; swap in a real <img> in its place.
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Profile photo preview';
+      img.className = preview.className + ' object-cover';
+      img.setAttribute('data-avatar-preview', '');
+      preview.replaceWith(img);
+    }
+    // Free the blob once the browser has painted it.
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  });
+})();
+</script>

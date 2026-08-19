@@ -1,0 +1,67 @@
+{% extends "base_auth.html" %}
+{% block auth_title %}Doctor Sign Up{% endblock %}
+{% block auth_card %}
+{% comment %}
+  Card width comes from base_auth.html's max-w-md wrapper — the card itself sets
+  no width, so labels, inputs, selects, the phone group, the checkbox and the
+  submit button all share one measure (req1 §5).
+{% endcomment %}
+<div class="card p-8 rounded-2xl shadow-lg">
+  <div class="text-center mb-7">
+    <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center mx-auto mb-3">
+      <i data-lucide="stethoscope" class="w-6 h-6 text-teal-600"></i>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900">Create Doctor Account</h1>
+    <p class="text-sm text-gray-500 mt-1">Join MedSync to manage your practice</p>
+  </div>
+
+  {% comment %}
+    space-y-5 is the single source of vertical rhythm; no field sets its own
+    margin, so nothing can drift out of step (req1 §1).
+  {% endcomment %}
+  <form method="post" novalidate class="space-y-5">
+    {% csrf_token %}
+    {% include "partials/form_errors.html" with form=form %}
+
+    {% include "partials/text_field.html" with id="full_name" name="full_name" label="Full Name" placeholder="Jane Smith" value=form.full_name.value errors=form.full_name.errors autocomplete="name" autofocus=1 required=1 %}
+
+    {% include "partials/text_field.html" with id="email" name="email" label="Email Address" type="email" placeholder="doctor@example.com" value=form.email.value errors=form.email.errors autocomplete="email" required=1 %}
+
+    {% include "partials/phone_field.html" with form=form phone_placeholder="(816) 762-3556" %}
+
+    {% include "partials/select_field.html" with id="specialty" name="specialty" label="Medical Specialty" choices=form.fields.specialty.choices selected=form.specialty.value errors=form.specialty.errors required=1 %}
+
+    {% include "partials/text_field.html" with id="license_id" name="license_id" label="License / Professional ID" placeholder="MD-123456" value=form.license_id.value errors=form.license_id.errors required=1 %}
+
+    {% include "partials/password_field.html" with id="password" name="password" label="Password" placeholder="Create a strong password" autocomplete="new-password" errors=form.password.errors hint="At least 8 characters, not entirely numeric." %}
+
+    {% include "partials/password_field.html" with id="password2" name="password2" label="Confirm Password" placeholder="Repeat your password" autocomplete="new-password" errors=form.password2.errors %}
+
+    <div class="form-field">
+      <div class="flex items-start gap-3">
+        <input type="checkbox" name="agree_terms" id="agree_terms"
+               class="mt-0.5 w-4 h-4 rounded accent-teal-600 flex-shrink-0"
+               {% if form.agree_terms.value %}checked{% endif %}
+               {% if form.agree_terms.errors %}aria-invalid="true" aria-describedby="agree_terms-msg"{% endif %} />
+        <label for="agree_terms" class="text-sm text-gray-600">
+          I agree to the <a href="#" class="text-teal-600 hover:underline">Terms of Service</a> and
+          <a href="#" class="text-teal-600 hover:underline">Privacy Policy</a>
+        </label>
+      </div>
+      {% if form.agree_terms.errors %}
+        <p class="form-error" id="agree_terms-msg">
+          <i data-lucide="alert-circle" class="w-3.5 h-3.5 flex-shrink-0 mt-px"></i>
+          <span>{{ form.agree_terms.errors.0 }}</span>
+        </p>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn-primary btn-block">Create Doctor Account</button>
+  </form>
+
+  <p class="text-center text-sm text-gray-500 mt-6">
+    Already have an account?
+    <a href="{% url 'accounts:doctor_login' %}" class="text-teal-600 font-medium hover:underline">Sign in</a>
+  </p>
+</div>
+{% endblock %}

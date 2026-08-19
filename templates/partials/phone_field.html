@@ -1,0 +1,103 @@
+{% comment %}
+   Phone number — country select + national number as one visual component
+   (req1 §2). Both controls are h-11 via .phone-code / .phone-number, so they
+   match in height and baseline without per-field tweaks.
+
+   The country select is a real form field (`country_code`), not a loose <select>
+   read by JS at submit time. That is what makes the value survive a validation
+   re-render: the form field holds only the *national* number and the server
+   combines it with the dial code at save time, so a stored number can never be
+   prefixed twice.
+
+   Usage: {% include "partials/phone_field.html" with form=form %}
+{% endcomment %}
+<div class="form-field">
+  <label for="phone" class="form-label">Phone Number</label>
+  <div class="phone-group">
+    <select name="country_code" id="country_code" class="phone-code"
+            aria-label="Country dialling code">
+      {% for opt_value, opt_label in form.fields.country_code.choices %}
+        <option value="{{ opt_value }}" {% if form.country_code.value == opt_value %}selected{% endif %}>{{ opt_label }}</option>
+      {% endfor %}
+    </select>
+    <input type="tel" name="phone" id="phone"
+           class="phone-number{% if form.phone.errors %} input-error{% endif %}"
+           value="{{ form.phone.value|default:'' }}"
+           placeholder="{{ phone_placeholder|default:'812 345 6789' }}"
+           autocomplete="tel-national"
+           {% if form.phone.errors %}aria-invalid="true"{% endif %}
+           aria-describedby="phone-msg" />
+  </div>
+  {% if form.phone.errors %}
+    <p class="form-error" id="phone-msg">
+      <i data-lucide="alert-circle" class="w-3.5 h-3.5 flex-shrink-0 mt-px"></i>
+      <span>{{ form.phone.errors.0 }}</span>
+    </p>
+  {% elif form.country_code.errors %}
+    <p class="form-error" id="phone-msg">
+      <i data-lucide="alert-circle" class="w-3.5 h-3.5 flex-shrink-0 mt-px"></i>
+      <span>{{ form.country_code.errors.0 }}</span>
+    </p>
+  {% else %}
+    <span class="form-hint" id="phone-msg">Enter your number without the country code.</span>
+  {% endif %}
+</div>
+
+<script>
+(() => {
+  const select = document.getElementById('country_code');
+  const input  = document.getElementById('phone');
+  if (!select || !input) return;
+
+  // Digit grouping per country, keyed on the ISO code already held in the select
+  // value — so no dial-code lookup table has to be mirrored into JS. Countries
+  // absent here fall back to DEFAULT.
+  const FORMATS = {
+    US: { groups: [3, 3, 4], max: 10, wrapFirst: true },
+    CA: { groups: [3, 3, 4], max: 10, wrapFirst: true },
+    GB: { groups: [4, 6],    max: 10 },
+    NG: { groups: [3, 3, 4], max: 10 },
+    IN: { groups: [5, 5],    max: 10 },
+    DE: { groups: [4, 7],    max: 11 },
+    FR: { groups: [1, 2, 2, 2, 2], max: 9 },
+    ZA: { groups: [2, 3, 4], max: 9 },
+    KE: { groups: [3, 3, 3], max: 9 },
+    GH: { groups: [3, 3, 4], max: 10 },
+    AE: { groups: [2, 3, 4], max: 9 },
+    AU: { groups: [3, 3, 3], max: 9 },
+    DEFAULT: { groups: [3, 3, 3, 3], max: 14 },
+  };
+
+  const fmt = () => FORMATS[select.value] || FORMATS.DEFAULT;
+
+  function group(digits) {
+    const f = fmt();
+    const parts = [];
+    let i = 0;
+    for (const size of f.groups) {
+      if (i >= digits.length) break;
+      parts.push(digits.slice(i, i + size));
+      i += size;
+    }
+    if (i < digits.length) parts.push(digits.slice(i));
+    // North American convention: (816) 762-3556
+    if (f.wrapFirst && parts.length) {
+      const [area, ...rest] = parts;
+      if (rest.length === 0) return digits.length >= 3 ? `(${area}) ` : area;
+      return `(${area}) ${rest.join('-')}`;
+    }
+    return parts.join(' ');
+  }
+
+  function reformat() {
+    const digits = input.value.replace(/\D/g, '').slice(0, fmt().max);
+    input.value = group(digits);
+  }
+
+  input.addEventListener('input', reformat);
+  // Changing country changes the grouping, so re-apply it to whatever is typed
+  // rather than discarding the user's digits.
+  select.addEventListener('change', reformat);
+  if (input.value) reformat();
+})();
+</script>

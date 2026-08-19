@@ -1,0 +1,32 @@
+{% extends "base_auth.html" %}
+{% block auth_title %}Resend Verification{% endblock %}
+{% block auth_card %}
+{% comment %}
+  Anonymous resend. The view's response is identical whether or not the address
+  is registered, so this page must not hint otherwise (req1 §7).
+{% endcomment %}
+<div class="card p-8 rounded-2xl shadow-lg">
+  <div class="text-center mb-7">
+    <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center mx-auto mb-3">
+      <i data-lucide="send" class="w-6 h-6 text-teal-600"></i>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900">Resend Verification</h1>
+    <p class="text-sm text-gray-500 mt-1">
+      Enter your email address and we'll send a new verification link
+    </p>
+  </div>
+
+  <form method="post" novalidate class="space-y-5">
+    {% csrf_token %}
+    {% include "partials/form_errors.html" with form=form %}
+
+    {% include "partials/text_field.html" with id="email" name="email" label="Email Address" type="email" placeholder="you@example.com" value=form.email.value errors=form.email.errors autocomplete="email" autofocus=1 required=1 %}
+
+    <button type="submit" class="btn-primary btn-block">Send Verification Link</button>
+  </form>
+
+  <p class="text-center text-sm text-gray-500 mt-6">
+    <a href="{% url 'accounts:login' %}" class="text-teal-600 font-medium hover:underline">Back to login</a>
+  </p>
+</div>
+{% endblock %}

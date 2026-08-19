@@ -1,0 +1,44 @@
+`{% extends "base_auth.html" %}
+{% block auth_title %}Doctor Login{% endblock %}
+{% block auth_card %}
+<div class="card p-8 rounded-2xl shadow-lg">
+  <div class="text-center mb-7">
+    <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center mx-auto mb-3">
+      <i data-lucide="stethoscope" class="w-6 h-6 text-teal-600"></i>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900">Doctor Login</h1>
+    <p class="text-sm text-gray-500 mt-1">Sign in to your MedSync account</p>
+  </div>
+
+  {% comment %}
+    No inline message block here. base.html already renders the message queue as
+    toasts, and iterating it twice rendered every message twice. Credential
+    failures now arrive as form errors instead, in the same styling as every other
+    error on the page.
+  {% endcomment %}
+  <form method="post" novalidate class="space-y-5">
+    {% csrf_token %}
+    {% include "partials/form_errors.html" with form=form %}
+
+    {% include "partials/text_field.html" with id="email" name="email" label="Email Address" type="email" placeholder="doctor@example.com" value=form.email.value errors=form.email.errors autocomplete="email" autofocus=1 required=1 %}
+
+    {% include "partials/password_field.html" with id="password" name="password" label="Password" placeholder="Your password" autocomplete="current-password" errors=form.password.errors %}
+
+    <div class="flex justify-end -mt-2">
+      <a href="{% url 'accounts:doctor_forgot_password' %}"
+         class="text-xs text-teal-600 hover:underline">Forgot password?</a>
+    </div>
+
+    <button type="submit" class="btn-primary btn-block">Sign In</button>
+  </form>
+
+  <p class="text-center text-sm text-gray-500 mt-6">
+    Don't have an account?
+    <a href="{% url 'accounts:doctor_signup' %}" class="text-teal-600 font-medium hover:underline">Create one</a>
+  </p>
+  <p class="text-center text-sm text-gray-400 mt-2">
+    Are you a patient?
+    <a href="{% url 'accounts:patient_login' %}" class="text-gray-500 hover:underline">Patient login</a>
+  </p>
+</div>
+{% endblock %}

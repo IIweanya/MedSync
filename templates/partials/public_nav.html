@@ -1,0 +1,124 @@
+{% comment %}
+   Public site navigation, shared by the landing page and the marketing pages.
+
+   Section links are in-page anchors on the landing page and absolute links back
+   to it everywhere else — otherwise "How It Works" would be a dead link on
+   /about/. Include with `on_landing=1` from the landing page.
+
+   Usage: {% include "partials/public_nav.html" with on_landing=1 active="about" %}
+{% endcomment %}
+{% url 'core:landing' as landing_url %}
+<nav class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+    <a href="{{ landing_url }}" class="flex items-center gap-2">
+      <img src="/static/images/medsync_logo.png" alt="MedSync" class="h-8 w-auto" />
+      <span class="font-semibold text-lg text-gray-900">MedSync</span>
+    </a>
+    <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
+      <a href="{% if on_landing %}#how-it-works{% else %}{{ landing_url }}#how-it-works{% endif %}"
+         class="hover:text-gray-900 transition-colors">How It Works</a>
+      <a href="{% if on_landing %}#for-doctors{% else %}{{ landing_url }}#for-doctors{% endif %}"
+         class="hover:text-gray-900 transition-colors">For Doctors</a>
+      <a href="{% if on_landing %}#for-patients{% else %}{{ landing_url }}#for-patients{% endif %}"
+         class="hover:text-gray-900 transition-colors">For Patients</a>
+      <a href="{% url 'core:about' %}"
+         class="hover:text-gray-900 transition-colors{% if active == 'about' %} text-gray-900 font-semibold{% endif %}">About</a>
+      <a href="{% url 'accounts:login' %}" class="hover:text-gray-900 transition-colors">Login</a>
+      <a href="{% url 'core:contact' %}"
+         class="hover:text-gray-900 transition-colors{% if active == 'contact' %} text-gray-900 font-semibold{% endif %}">Contact</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="{% url 'accounts:patient_signup' %}" class="btn-primary text-sm">Get Started</a>
+      {% comment %}
+        Stays above the drawer (nav is z-50, drawer z-40) so it remains tappable as
+        the close control once the panel is open.
+      {% endcomment %}
+      <button id="mobile-menu-btn" type="button"
+              class="md:hidden p-2 -mr-2 text-gray-500 hover:text-gray-700"
+              aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-menu">
+        <i data-lucide="menu" class="w-5 h-5 pointer-events-none"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+{% comment %}
+  The drawer and its backdrop sit OUTSIDE <nav> deliberately. The nav has
+  `backdrop-blur`, and a non-none backdrop-filter makes an element a containing
+  block for fixed-position descendants — so a `fixed` drawer nested inside would
+  anchor to the nav bar instead of the viewport, and `bottom-0` would collapse.
+
+  Open/closed state lives in plain CSS in base.html (`.is-open`), not in Tailwind
+  utilities, so the panel cannot be left showing if the Play CDN fails to compile.
+  Both are pinned to `top-16` (the nav's h-16) so the panel slides in beneath the
+  header rather than fighting it for the same space.
+{% endcomment %}
+<div id="mobile-menu-overlay" class="fixed inset-x-0 top-16 bottom-0 z-30 bg-gray-900/40"></div>
+
+<div id="mobile-menu"
+     class="fixed top-16 bottom-0 left-0 z-40 w-72 max-w-[80vw]
+            bg-white border-r border-gray-100 shadow-xl overflow-y-auto
+            px-4 py-5 space-y-1"
+     aria-label="Mobile navigation">
+  <a href="{% if on_landing %}#how-it-works{% else %}{{ landing_url }}#how-it-works{% endif %}" class="block px-2 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">How It Works</a>
+  <a href="{% if on_landing %}#for-doctors{% else %}{{ landing_url }}#for-doctors{% endif %}" class="block px-2 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">For Doctors</a>
+  <a href="{% if on_landing %}#for-patients{% else %}{{ landing_url }}#for-patients{% endif %}" class="block px-2 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">For Patients</a>
+  <a href="{% url 'core:about' %}" class="block px-2 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">About</a>
+  <a href="{% url 'accounts:login' %}" class="block px-2 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Login</a>
+  <a href="{% url 'core:contact' %}" class="block px-2 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">Contact</a>
+  <hr class="border-gray-100 my-3" />
+  <a href="{% url 'accounts:patient_signup' %}" class="btn-primary w-full justify-center mt-2">Get Started</a>
+</div>
+
+<script>
+(() => {
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('mobile-menu-overlay');
+  if (!btn || !menu || !overlay) return;
+
+  let open = false;
+
+  const setIcon = (name) => {
+    const icon = btn.querySelector('[data-lucide], svg');
+    if (!icon) return;
+    icon.setAttribute('data-lucide', name);
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  };
+
+  const openMenu = () => {
+    open = true;
+    menu.classList.add('is-open');
+    overlay.classList.add('is-open');
+    btn.setAttribute('aria-expanded', 'true');
+    btn.setAttribute('aria-label', 'Close navigation menu');
+    setIcon('x');
+    document.documentElement.classList.add('overflow-hidden');
+  };
+
+  const closeMenu = () => {
+    open = false;
+    menu.classList.remove('is-open');
+    overlay.classList.remove('is-open');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-label', 'Open navigation menu');
+    setIcon('menu');
+    document.documentElement.classList.remove('overflow-hidden');
+  };
+
+  // One button for both directions — it's the hamburger closed, an X open.
+  btn.addEventListener('click', () => (open ? closeMenu() : openMenu()));
+  overlay.addEventListener('click', closeMenu);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) closeMenu(); });
+
+  // In-page anchors don't reload, so without this the drawer would stay open on top
+  // of the section the user just jumped to.
+  menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+
+  // Leaving mobile width with the drawer open would strand the overflow-hidden lock
+  // on a layout where the drawer is no longer shown.
+  window.matchMedia('(min-width: 768px)').addEventListener('change', (e) => {
+    if (e.matches && open) closeMenu();
+  });
+})();
+</script>

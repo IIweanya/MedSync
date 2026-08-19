@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Contact — MedSync{% endblock %}
+{% block body %}
+
+{% include "partials/public_nav.html" with active="contact" %}
+
+<section class="bg-gradient-to-br from-primary-50 via-white to-teal-50 py-14">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Get in touch</h1>
+    <p class="text-lg text-gray-600">
+      Questions about your account, a booking, or the platform? Send us a note.
+    </p>
+  </div>
+</section>
+
+<section class="py-14 bg-white">
+  <div class="max-w-5xl mx-auto px-6 grid lg:grid-cols-5 gap-10">
+
+    <!-- Form -->
+    <div class="lg:col-span-3">
+      <div class="card p-7 rounded-2xl">
+        <h2 class="text-lg font-semibold text-gray-900 mb-6">Send us a message</h2>
+
+        <form method="post" novalidate class="space-y-5">
+          {% csrf_token %}
+          {% include "partials/form_errors.html" with form=form %}
+
+          {% include "partials/text_field.html" with id="name" name="name" label="Your Name" placeholder="Jane Smith" value=form.name.value errors=form.name.errors autocomplete="name" required=1 %}
+
+          {% include "partials/text_field.html" with id="email" name="email" label="Email Address" type="email" placeholder="you@example.com" value=form.email.value errors=form.email.errors autocomplete="email" required=1 %}
+
+          {% include "partials/select_field.html" with id="subject" name="subject" label="Topic" choices=form.fields.subject.choices selected=form.subject.value errors=form.subject.errors required=1 %}
+
+          <div class="form-field">
+            <label for="message" class="form-label">Message</label>
+            <textarea name="message" id="message" rows="5"
+                      class="form-textarea resize-y{% if form.message.errors %} input-error{% endif %}"
+                      placeholder="How can we help?"
+                      {% if form.message.errors %}aria-invalid="true" aria-describedby="message-msg"{% endif %}
+                      required>{{ form.message.value|default:'' }}</textarea>
+            {% if form.message.errors %}
+              <p class="form-error" id="message-msg">
+                <i data-lucide="alert-circle" class="w-3.5 h-3.5 flex-shrink-0 mt-px"></i>
+                <span>{{ form.message.errors.0 }}</span>
+              </p>
+            {% endif %}
+          </div>
+
+          <button type="submit" class="btn-primary btn-block">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div class="lg:col-span-2 space-y-5">
+      <div class="card p-6 rounded-2xl">
+        <h2 class="font-semibold text-gray-900 mb-4">Other ways to reach us</h2>
+        <ul class="space-y-4 text-sm">
+          <li class="flex gap-3">
+            <i data-lucide="mail" class="w-4 h-4 text-teal-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <p class="font-medium text-gray-900">Email</p>
+              <a href="mailto:{{ support_email }}" class="text-teal-600 hover:underline break-all">{{ support_email }}</a>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <i data-lucide="clock" class="w-4 h-4 text-teal-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <p class="font-medium text-gray-900">Response time</p>
+              <p class="text-gray-500">Within one business day</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <i data-lucide="life-buoy" class="w-4 h-4 text-teal-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <p class="font-medium text-gray-900">Account help</p>
+              <p class="text-gray-500">
+                Signed in? Use the Help &amp; Support link in your dashboard for
+                faster, account-specific help.
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card p-6 rounded-2xl bg-gray-50 border-gray-100">
+        <div class="flex gap-3">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <p class="text-sm font-semibold text-gray-900">Not for emergencies</p>
+            <p class="text-sm text-gray-600 mt-1 leading-relaxed">
+              MedSync is a scheduling tool, not a medical service. If this is a
+              medical emergency, contact your local emergency number instead.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-6 rounded-2xl">
+        <p class="text-sm font-semibold text-gray-900 mb-2">Looking for a quick answer?</p>
+        <p class="text-sm text-gray-600 mb-4">The FAQ covers most common questions.</p>
+        <a href="{% url 'core:faq' %}" class="btn-secondary text-sm">Read the FAQ</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% include "partials/public_footer.html" %}
+{% endblock %}

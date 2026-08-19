@@ -1,0 +1,86 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Appointment History — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/doctor_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/doctor_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+  <h1 class="text-xl font-bold text-gray-900">Appointment History</h1>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit flex-wrap">
+    {% for t, label in forloop.parentloop|default:"" %}{% endfor %}
+    {% for t, label in "all|All,completed|Completed,cancelled|Cancelled,rescheduled|Rescheduled,no_show|No Show"|split:"," %}
+    {% endfor %}
+    <a href="?tab=all{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'all' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">All</a>
+    <a href="?tab=completed{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'completed' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">Completed</a>
+    <a href="?tab=cancelled{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'cancelled' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">Cancelled</a>
+    <a href="?tab=rescheduled{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'rescheduled' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">Rescheduled</a>
+    <a href="?tab=no_show{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'no_show' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">No Show</a>
+  </div>
+
+  <!-- Search -->
+  <form method="get" class="flex gap-3">
+    <input type="hidden" name="tab" value="{{ tab }}" />
+    <div class="flex items-center gap-2 flex-1 max-w-sm bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
+      <i data-lucide="search" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
+      <input type="text" name="q" value="{{ search }}" placeholder="Search patient…" class="bg-transparent text-sm outline-none w-full" />
+    </div>
+    <button type="submit" class="btn-secondary">Search</button>
+  </form>
+
+  <!-- Table -->
+  <div class="card rounded-xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-100">
+            <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-5 py-3">Patient</th>
+            <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3">Date</th>
+            <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3 hidden md:table-cell">Type</th>
+            <th class="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide px-4 py-3">Status</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for appt in appointments %}
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-5 py-3.5">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <span class="text-xs font-bold text-gray-600">{{ appt.patient.full_name|first|upper }}</span>
+                </div>
+                <span class="font-medium text-gray-800">{{ appt.patient.full_name }}</span>
+              </div>
+            </td>
+            <td class="px-4 py-3.5 whitespace-nowrap">
+              <p class="font-medium text-gray-700">{{ appt.date|date:"M j, Y" }}</p>
+              <p class="text-xs text-gray-500">{{ appt.start_time|time:"g:i A" }}</p>
+            </td>
+            <td class="px-4 py-3.5 hidden md:table-cell text-gray-600">{{ appt.get_appointment_type_display }}</td>
+            <td class="px-4 py-3.5">
+              <span class="px-2.5 py-1 text-xs font-semibold rounded-full
+                {% if appt.status == 'completed' %}bg-gray-100 text-gray-600
+                {% elif appt.status == 'cancelled' %}bg-red-100 text-red-700
+                {% elif appt.status == 'rescheduled' %}bg-orange-100 text-orange-700
+                {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                {{ appt.get_status_display }}
+              </span>
+            </td>
+            <td class="px-4 py-3.5 text-right">
+              <a href="{% url 'doctor_appointment_detail' appt.pk %}" class="btn-secondary text-xs px-3 py-1.5">View</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="py-14 text-center text-sm text-gray-400">No records found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

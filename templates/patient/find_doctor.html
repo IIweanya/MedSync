@@ -1,0 +1,115 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Find a Doctor — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/patient_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/patient_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+  <h1 class="text-xl font-bold text-gray-900">Find a Doctor</h1>
+
+  <!-- Search + filter -->
+  <form method="get" class="card p-4 rounded-xl flex flex-wrap gap-3">
+    <div class="flex items-center gap-2 flex-1 min-w-48 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+      <i data-lucide="search" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
+      <input type="text" name="q" value="{{ search }}" placeholder="Search by name, specialty, location…" class="bg-transparent text-sm outline-none w-full" />
+    </div>
+    <select name="specialty" class="form-select !w-auto min-w-44">
+      <option value="">All Specialties</option>
+      {% for val, label in specialty_choices %}
+      <option value="{{ val }}" {% if selected_specialty == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn-primary">Search</button>
+    {% if search or selected_specialty %}
+    <a href="{% url 'find_doctor' %}" class="btn-secondary">Clear</a>
+    {% endif %}
+  </form>
+
+  <!-- Doctor cards -->
+  {% if doctors %}
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    {% for doctor in doctors %}
+    <div class="card p-5 rounded-xl hover:shadow-md transition-shadow flex flex-col">
+      <div class="flex items-start gap-3 mb-4">
+        {% if doctor.get_photo_url %}
+          <img src="{{ doctor.get_photo_url }}" alt="{{ doctor.display_name }}" class="w-14 h-14 rounded-full object-cover flex-shrink-0" />
+        {% else %}
+          <div class="w-14 h-14 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-xl font-bold text-primary-700">{{ doctor.full_name|first|upper }}</span>
+          </div>
+        {% endif %}
+        <div class="flex-1 min-w-0">
+          <h3 class="font-semibold text-gray-900">{{ doctor.display_name }}</h3>
+          <p class="text-sm text-primary-600 font-medium">{{ doctor.doctor_profile.get_specialty_display }}</p>
+          {% if doctor.doctor_profile.location %}
+          <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+            <i data-lucide="map-pin" class="w-3 h-3"></i>
+            {{ doctor.doctor_profile.location }}
+          </p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if doctor.doctor_profile.bio %}
+      <p class="text-sm text-gray-500 line-clamp-2 mb-3">{{ doctor.doctor_profile.bio }}</p>
+      {% endif %}
+
+      <div class="flex flex-wrap gap-2 mb-4">
+        {% if doctor.doctor_profile.appointment_duration %}
+        <span class="inline-flex items-center gap-1 text-xs bg-gray-50 border border-gray-100 rounded-full px-2.5 py-1 text-gray-600">
+          <i data-lucide="clock" class="w-3 h-3"></i>
+          {{ doctor.doctor_profile.appointment_duration }} min
+        </span>
+        {% endif %}
+        {% for ctype in doctor.doctor_profile.get_consultation_types_list %}
+        <span class="text-xs bg-primary-50 text-primary-700 rounded-full px-2.5 py-1">{{ ctype }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="mt-auto">
+        <a href="{% url 'book_appointment' doctor.pk %}" class="btn-primary w-full justify-center">
+          <i data-lucide="calendar-plus" class="w-4 h-4"></i> Book Appointment
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card rounded-xl py-16 text-center">
+    {% comment %}
+      Three distinct reasons the list can be empty, each with a different fix. A
+      single "No doctors found" would send someone hunting through filters when the
+      real problem is a missing country on their profile.
+    {% endcomment %}
+    {% if not patient_country %}
+      <div class="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="map-pin-off" class="w-7 h-7 text-orange-400"></i>
+      </div>
+      <p class="text-sm font-medium text-gray-700">Add your country to start booking</p>
+      <p class="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
+        MedSync matches you with doctors in your own country, so we need to know
+        where you are before we can show anyone.
+      </p>
+      <a href="{% url 'accounts:profile_view' %}" class="btn-primary mt-4">Go to Profile</a>
+    {% elif search or selected_specialty %}
+      <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="search-x" class="w-7 h-7 text-gray-300"></i>
+      </div>
+      <p class="text-sm font-medium text-gray-500">No matching doctors in {{ patient_country_label }}</p>
+      <p class="text-xs text-gray-400 mt-1">Try adjusting your search filters.</p>
+      <a href="{% url 'find_doctor' %}" class="btn-secondary mt-4">Clear Filters</a>
+    {% else %}
+      <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="map-pin" class="w-7 h-7 text-gray-300"></i>
+      </div>
+      <p class="text-sm font-medium text-gray-500">No doctors in {{ patient_country_label }} yet</p>
+      <p class="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+        Doctors are only bookable in their own country. Check back as more join.
+      </p>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

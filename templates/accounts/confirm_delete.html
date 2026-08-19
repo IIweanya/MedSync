@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Confirm account deletion — MedSync{% endblock %}
+{% block body %}
+<div class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md card p-6">
+    <h1 class="text-xl font-semibold mb-4">Delete your account</h1>
+    <p class="text-sm text-gray-600 mb-6">This will permanently delete your account, including your email and any associated data. This action cannot be undone.</p>
+
+    <form method="post" action="{% url 'accounts:delete_account' %}">
+      {% csrf_token %}
+      <div class="flex gap-3">
+        <button type="submit" class="btn-danger">Yes, delete my account</button>
+        <a href="{% url 'core:landing' %}" class="btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

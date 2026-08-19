@@ -1,0 +1,56 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Confirm Appointment — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/doctor_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto space-y-5">
+  <a href="{% url 'doctor_appointment_detail' appointment.pk %}"
+     class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
+    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to appointment
+  </a>
+
+  <div class="card p-6 rounded-xl">
+    <h1 class="text-lg font-semibold text-gray-900">Confirm Appointment</h1>
+    <p class="text-sm text-gray-500 mt-1">
+      Set the day and time this session will take place. The patient is emailed
+      either way, and told explicitly if it differs from what they requested.
+    </p>
+
+    <div class="mt-5 p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm space-y-1.5">
+      <div class="flex justify-between gap-4">
+        <span class="text-gray-500">Patient</span>
+        <span class="font-medium text-gray-900">{{ appointment.patient.full_name }}</span>
+      </div>
+      <div class="flex justify-between gap-4">
+        <span class="text-gray-500">Type</span>
+        <span class="font-medium text-gray-900">{{ appointment.get_appointment_type_display }}</span>
+      </div>
+      <div class="flex justify-between gap-4">
+        <span class="text-gray-500">Requested</span>
+        <span class="font-medium text-gray-900">
+          {{ appointment.date|date:"j M Y" }} at {{ appointment.start_time|time:"H:i" }}
+        </span>
+      </div>
+    </div>
+
+    <form method="post" novalidate class="mt-5 space-y-5">
+      {% csrf_token %}
+      {% include "partials/form_errors.html" with form=form %}
+
+      {% include "partials/text_field.html" with id="date" name="date" label="Date" type="date" value=form.date.value errors=form.date.errors required=1 %}
+
+      {% include "partials/text_field.html" with id="start_time" name="start_time" label="Start Time" type="time" value=form.start_time.value errors=form.start_time.errors required=1 hint="The end time is worked out from your configured appointment duration." %}
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="submit" class="btn-primary flex-1 justify-center">
+          <i data-lucide="check" class="w-4 h-4"></i> Confirm Appointment
+        </button>
+        <a href="{% url 'doctor_appointment_detail' appointment.pk %}"
+           class="btn-secondary flex-1 justify-center">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

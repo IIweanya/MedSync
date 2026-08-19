@@ -1,0 +1,68 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Appointment History — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/patient_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/patient_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+  <h1 class="text-xl font-bold text-gray-900">Appointment History</h1>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 bg-gray-100 rounded-xl p-1 w-fit flex-wrap">
+    <a href="?tab=all{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'all' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">All</a>
+    <a href="?tab=completed{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'completed' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">Completed</a>
+    <a href="?tab=cancelled{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'cancelled' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">Cancelled</a>
+    <a href="?tab=rescheduled{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'rescheduled' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">Rescheduled</a>
+    <a href="?tab=no_show{% if search %}&q={{ search }}{% endif %}" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors {% if tab == 'no_show' %}bg-white text-gray-900 shadow-sm{% else %}text-gray-500 hover:text-gray-700{% endif %}">No Show</a>
+  </div>
+
+  <!-- Search -->
+  <form method="get" class="flex gap-3">
+    <input type="hidden" name="tab" value="{{ tab }}" />
+    <div class="flex items-center gap-2 flex-1 max-w-sm bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm">
+      <i data-lucide="search" class="w-4 h-4 text-gray-400 flex-shrink-0"></i>
+      <input type="text" name="q" value="{{ search }}" placeholder="Search doctor…" class="bg-transparent text-sm outline-none w-full" />
+    </div>
+    <button type="submit" class="btn-secondary">Search</button>
+  </form>
+
+  <!-- List -->
+  {% if appointments %}
+  <div class="card rounded-xl overflow-hidden">
+    <div class="divide-y divide-gray-50">
+      {% for appt in appointments %}
+      <a href="{% url 'patient_appointment_detail' appt.pk %}" class="flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors">
+        <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+          <span class="text-sm font-bold text-primary-700">{{ appt.doctor.full_name|first|upper }}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-900">{{ appt.doctor.display_name }}</p>
+          <p class="text-xs text-gray-500">
+            {{ appt.date|date:"M j, Y" }} · {{ appt.start_time|time:"g:i A" }} · {{ appt.get_appointment_type_display }}
+          </p>
+        </div>
+        <span class="flex-shrink-0 px-2.5 py-1 text-xs font-semibold rounded-full
+          {% if appt.status == 'completed' %}bg-gray-100 text-gray-600
+          {% elif appt.status == 'cancelled' %}bg-red-100 text-red-700
+          {% elif appt.status == 'rescheduled' %}bg-orange-100 text-orange-700
+          {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+          {{ appt.get_status_display }}
+        </span>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 flex-shrink-0"></i>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+  <div class="card rounded-xl py-16 text-center">
+    <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
+      <i data-lucide="history" class="w-7 h-7 text-gray-300"></i>
+    </div>
+    <p class="text-sm font-medium text-gray-500">No history yet</p>
+    <p class="text-xs text-gray-400 mt-1">Your past appointments will appear here.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+<a href="{% url 'patient_dashboard' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.url_name == 'patient_dashboard' %}bg-teal-50 text-teal-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+  <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+</a>
+<a href="{% url 'find_doctor' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.url_name == 'find_doctor' or request.resolver_match.url_name == 'book_appointment' %}bg-teal-50 text-teal-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+  <i data-lucide="calendar-plus" class="w-4 h-4"></i> Book Appointment
+</a>
+<a href="{% url 'patient_appointments' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.url_name == 'patient_appointments' or request.resolver_match.url_name == 'patient_appointment_detail' %}bg-teal-50 text-teal-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+  <i data-lucide="calendar-check" class="w-4 h-4"></i> My Appointments
+</a>
+<a href="{% url 'patient_calendar' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.url_name == 'patient_calendar' %}bg-teal-50 text-teal-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+  <i data-lucide="calendar" class="w-4 h-4"></i> Calendar
+</a>
+<a href="{% url 'patient_history' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.url_name == 'patient_history' %}bg-teal-50 text-teal-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+  <i data-lucide="history" class="w-4 h-4"></i> History
+</a>
+<a href="{% url 'notification_list' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors {% if request.resolver_match.url_name == 'notification_list' %}bg-teal-50 text-teal-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+  <i data-lucide="bell" class="w-4 h-4"></i> Notifications
+  {% if unread_notifications_count %}
+  <span class="ml-auto bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">{{ unread_notifications_count }}</span>
+  {% endif %}
+</a>
+<hr class="border-gray-100 my-2" />
+<a href="{% url 'accounts:profile_view' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+  <i data-lucide="user-circle" class="w-4 h-4"></i> Profile
+</a>
+<a href="{% url 'accounts:settings_view' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
+  <i data-lucide="settings" class="w-4 h-4"></i> Settings
+</a>
+<a href="{% url 'accounts:confirm_delete' %}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors">
+  <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+</a>

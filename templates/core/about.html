@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}About — MedSync{% endblock %}
+{% block body %}
+
+{% include "partials/public_nav.html" with active="about" %}
+
+<!-- Hero -->
+<section class="bg-gradient-to-br from-primary-50 via-white to-teal-50 py-16 lg:py-20">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <div class="inline-flex items-center gap-2 bg-white border border-primary-100 rounded-full px-4 py-1.5 text-sm text-primary-700 font-medium mb-6">
+      <i data-lucide="heart-pulse" class="w-4 h-4"></i>
+      About MedSync
+    </div>
+    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-5">
+      Scheduling shouldn't be the hardest part of healthcare.
+    </h1>
+    <p class="text-lg text-gray-600 leading-relaxed">
+      MedSync gives doctors control of their calendar and gives patients a way to
+      book that takes seconds, not phone calls.
+    </p>
+  </div>
+</section>
+
+<!-- Mission -->
+<section class="py-16 bg-white">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="grid md:grid-cols-2 gap-10 items-start">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">What we're building</h2>
+        <div class="space-y-4 text-gray-600 leading-relaxed">
+          <p>
+            Most appointment booking still runs on phone tag. A patient calls during
+            business hours, waits on hold, and takes whatever slot is left. A
+            practice spends hours a week on the other end of that call.
+          </p>
+          <p>
+            MedSync replaces that with one shared source of truth. Doctors publish
+            their real availability once; patients see only genuinely open slots and
+            book directly. Both sides get the same clear record of what was booked,
+            moved, or cancelled.
+          </p>
+        </div>
+      </div>
+      <div class="card p-6 rounded-2xl bg-gray-50 border-gray-100">
+        <h3 class="font-semibold text-gray-900 mb-4">What we care about</h3>
+        <ul class="space-y-4">
+          <li class="flex gap-3">
+            <i data-lucide="shield-check" class="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Trust</p>
+              <p class="text-sm text-gray-500">Clear records, confirmed changes, no surprises.</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <i data-lucide="zap" class="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Speed</p>
+              <p class="text-sm text-gray-500">A doctor should read their day at a glance.</p>
+            </div>
+          </li>
+          <li class="flex gap-3">
+            <i data-lucide="accessibility" class="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <p class="text-sm font-medium text-gray-900">Access</p>
+              <p class="text-sm text-gray-500">Usable on any device, by anyone, at any hour.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Who it's for -->
+<section class="py-16 bg-gray-50 border-y border-gray-100">
+  <div class="max-w-5xl mx-auto px-6">
+    <h2 class="text-2xl font-bold text-gray-900 text-center mb-10">Built for both sides of the appointment</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="card p-7 rounded-2xl">
+        <div class="w-11 h-11 rounded-xl bg-primary-100 flex items-center justify-center mb-4">
+          <i data-lucide="stethoscope" class="w-5 h-5 text-primary-600"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">For doctors</h3>
+        <p class="text-sm text-gray-600 leading-relaxed mb-5">
+          Set working hours and breaks once, and let the calendar enforce them. Track
+          today's schedule, patient history, and every reschedule in one place.
+        </p>
+        <a href="{% url 'accounts:doctor_signup' %}" class="btn-primary text-sm">
+          Create a doctor account
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+      <div class="card p-7 rounded-2xl">
+        <div class="w-11 h-11 rounded-xl bg-teal-100 flex items-center justify-center mb-4">
+          <i data-lucide="user" class="w-5 h-5 text-teal-600"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">For patients</h3>
+        <p class="text-sm text-gray-600 leading-relaxed mb-5">
+          Find a doctor, pick a real open slot, and book in a few taps. Reschedule or
+          cancel yourself, and keep your full appointment history to hand.
+        </p>
+        <a href="{% url 'accounts:patient_signup' %}" class="btn-primary text-sm">
+          Create a patient account
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-16 bg-white">
+  <div class="max-w-2xl mx-auto px-6 text-center">
+    <h2 class="text-2xl font-bold text-gray-900 mb-3">Questions before you start?</h2>
+    <p class="text-gray-600 mb-7">
+      Read the walkthrough, browse the FAQ, or get in touch — we're happy to help.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a href="{% url 'core:how_it_works' %}" class="btn-primary">How It Works</a>
+      <a href="{% url 'core:faq' %}" class="btn-secondary">Read the FAQ</a>
+      <a href="{% url 'core:contact' %}" class="btn-secondary">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+{% include "partials/public_footer.html" %}
+{% endblock %}

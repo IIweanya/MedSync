@@ -1,0 +1,48 @@
+{% comment %}
+   Public site footer, shared by the landing page and the marketing pages.
+   Section links resolve back to the landing page when not on it — see the note
+   in partials/public_nav.html.
+
+   Usage: {% include "partials/public_footer.html" with on_landing=1 %}
+{% endcomment %}
+{% url 'core:landing' as landing_url %}
+<footer class="bg-gray-900 text-gray-400 py-12">
+  <div class="max-w-7xl mx-auto px-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+    <div>
+      <div class="flex items-center gap-2 mb-4">
+        <img src="/static/images/favicon_medSurg.png" alt="MedSync" class="h-7 w-auto brightness-0 invert" />
+        <span class="text-white font-semibold">MedSync</span>
+      </div>
+      <p class="text-sm leading-relaxed">Healthcare appointments, made simple for doctors and patients alike.</p>
+    </div>
+    <div>
+      <p class="text-white text-sm font-semibold mb-3">Product</p>
+      <ul class="space-y-2 text-sm">
+        <li><a href="{% if on_landing %}#how-it-works{% else %}{{ landing_url }}#how-it-works{% endif %}" class="hover:text-white transition-colors">How It Works</a></li>
+        <li><a href="{% if on_landing %}#for-doctors{% else %}{{ landing_url }}#for-doctors{% endif %}" class="hover:text-white transition-colors">For Doctors</a></li>
+        <li><a href="{% if on_landing %}#for-patients{% else %}{{ landing_url }}#for-patients{% endif %}" class="hover:text-white transition-colors">For Patients</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-white text-sm font-semibold mb-3">Company</p>
+      <ul class="space-y-2 text-sm">
+        <li><a href="{% url 'core:about' %}" class="hover:text-white transition-colors">About</a></li>
+        <li><a href="{% url 'core:how_it_works' %}" class="hover:text-white transition-colors">Guide</a></li>
+        <li><a href="{% url 'core:contact' %}" class="hover:text-white transition-colors">Contact</a></li>
+        <li><a href="{% url 'core:faq' %}" class="hover:text-white transition-colors">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-white text-sm font-semibold mb-3">Get Started</p>
+      <ul class="space-y-2 text-sm">
+        <li><a href="{% url 'accounts:doctor_signup' %}" class="hover:text-white transition-colors">Doctor Signup</a></li>
+        <li><a href="{% url 'accounts:patient_signup' %}" class="hover:text-white transition-colors">Patient Signup</a></li>
+        <li><a href="{% url 'accounts:login' %}" class="hover:text-white transition-colors">Login</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-6 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <p class="text-xs">© 2026 MedSync. All rights reserved.</p>
+    <p class="text-xs">Built with Django &amp; Tailwind CSS</p>
+  </div>
+</footer>

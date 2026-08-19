@@ -1,0 +1,84 @@
+{% extends "base_dashboard.html" %}
+{% block title %}My Profile — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/doctor_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/doctor_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-5">
+  <h1 class="text-xl font-bold text-gray-900">My Profile</h1>
+  <div class="card p-6 rounded-xl">
+    <form method="post" enctype="multipart/form-data" novalidate class="space-y-5">
+      {% csrf_token %}
+      <!-- Photo -->
+      <div class="flex items-center gap-5">
+        {% if profile.photo %}
+          <img src="{{ profile.photo.url }}" alt="Photo" data-avatar-preview
+               class="w-20 h-20 rounded-full object-cover border-2 border-gray-100" />
+        {% else %}
+          <div class="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center" data-avatar-preview>
+            <span class="text-2xl font-bold text-primary-700">{{ request.user.full_name|first|upper }}</span>
+          </div>
+        {% endif %}
+        <div>
+          <p class="text-sm font-semibold text-gray-800">{{ request.user.display_name }}</p>
+          <p class="text-xs text-gray-500 mb-2">{{ profile.get_specialty_display }}</p>
+          {% include "partials/photo_field.html" with errors=form.photo.errors %}
+        </div>
+      </div>
+      <hr class="border-gray-100" />
+      <!-- Fields -->
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Full Name</label>
+          <input type="text" name="full_name" value="{{ form.full_name.value|default:'' }}" class="form-input" required />
+          {% if form.full_name.errors %}<p class="text-xs text-red-500 mt-1">{{ form.full_name.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" value="{{ form.phone.value|default:'' }}" class="form-input" />
+        </div>
+        {% include "partials/select_field.html" with id="country" name="country" label="Country" choices=form.fields.country.choices selected=form.country.value errors=form.country.errors hint="Patients can only book with doctors in the same country." %}
+        <div>
+          <label class="form-label">Specialty</label>
+          <select name="specialty" class="form-select">
+            {% for val, label in form.fields.specialty.choices %}
+            <option value="{{ val }}" {% if form.specialty.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="form-label">License / Professional ID</label>
+          <input type="text" name="license_id" value="{{ form.license_id.value|default:'' }}" class="form-input" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="form-label">Location</label>
+          <input type="text" name="location" value="{{ form.location.value|default:'' }}" placeholder="City, Country" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Appointment Duration (min)</label>
+          <input type="number" name="appointment_duration" value="{{ form.appointment_duration.value|default:'30' }}" min="10" max="180" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Buffer Time (min)</label>
+          <input type="number" name="buffer_time" value="{{ form.buffer_time.value|default:'10' }}" min="0" max="60" class="form-input" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="form-label">Biography</label>
+          <textarea name="bio" rows="4" placeholder="Tell patients about yourself…" class="form-textarea resize-none">{{ form.bio.value|default:'' }}</textarea>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="form-label">Consultation Types <span class="text-gray-400 font-normal">(comma-separated)</span></label>
+          <input type="text" name="consultation_types" value="{{ form.consultation_types.value|default:'' }}" placeholder="In-person, Video" class="form-input" />
+        </div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary">
+          <i data-lucide="save" class="w-4 h-4"></i> Save Profile
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

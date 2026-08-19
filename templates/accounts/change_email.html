@@ -1,0 +1,39 @@
+{% extends "base_auth.html" %}
+{% block auth_title %}Change Email{% endblock %}
+{% block auth_card %}
+{% comment %}
+  Lets a user fix a typo'd address before verification (req1 §6). Guarded by the
+  unverified-session flag, which is only set after a correct password.
+{% endcomment %}
+<div class="card p-8 rounded-2xl shadow-lg">
+  <div class="text-center mb-7">
+    <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center mx-auto mb-3">
+      <i data-lucide="mail" class="w-6 h-6 text-teal-600"></i>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-900">Change Email</h1>
+    <p class="text-sm text-gray-500 mt-1">
+      We'll send a new verification link to your updated address
+    </p>
+  </div>
+
+  <div class="mb-5 p-3.5 bg-gray-50 border border-gray-200 rounded-lg">
+    <p class="text-xs text-gray-500">Current address</p>
+    <p class="text-sm font-medium text-gray-900 mt-0.5 break-all">{{ current_email }}</p>
+  </div>
+
+  <form method="post" novalidate class="space-y-5">
+    {% csrf_token %}
+    {% include "partials/form_errors.html" with form=form %}
+
+    {% include "partials/text_field.html" with id="email" name="email" label="New Email Address" type="email" placeholder="you@example.com" value=form.email.value errors=form.email.errors autocomplete="email" autofocus=1 required=1 %}
+
+    <button type="submit" class="btn-primary btn-block">Update &amp; Resend Link</button>
+  </form>
+
+  <p class="text-center text-sm text-gray-500 mt-6">
+    <a href="{% url 'accounts:verify_email_required' %}" class="text-teal-600 font-medium hover:underline">Back</a>
+    <span class="text-gray-300 mx-2">·</span>
+    <a href="{{ login_url }}" class="text-gray-500 hover:underline">Back to login</a>
+  </p>
+</div>
+{% endblock %}

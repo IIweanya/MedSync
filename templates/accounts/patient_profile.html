@@ -1,0 +1,63 @@
+{% extends "base_dashboard.html" %}
+{% block title %}My Profile — MedSync{% endblock %}
+{% block profile_url %}{% url 'accounts:profile_view' %}{% endblock %}
+{% block settings_url %}{% url 'accounts:settings_view' %}{% endblock %}
+{% block sidebar_nav %}{% include "partials/patient_nav.html" %}{% endblock %}
+{% block mobile_nav %}{% include "partials/patient_mobile_nav.html" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-5">
+  <h1 class="text-xl font-bold text-gray-900">My Profile</h1>
+  <div class="card p-6 rounded-xl">
+    <form method="post" enctype="multipart/form-data" novalidate class="space-y-5">
+      {% csrf_token %}
+      <div class="flex items-center gap-5">
+        {% if profile.photo %}
+          <img src="{{ profile.photo.url }}" alt="Photo" data-avatar-preview
+               class="w-20 h-20 rounded-full object-cover border-2 border-gray-100" />
+        {% else %}
+          <div class="w-20 h-20 rounded-full bg-teal-100 flex items-center justify-center" data-avatar-preview>
+            <span class="text-2xl font-bold text-teal-700">{{ request.user.full_name|first|upper }}</span>
+          </div>
+        {% endif %}
+        <div>
+          <p class="text-sm font-semibold text-gray-800">{{ request.user.full_name }}</p>
+          <p class="text-xs text-gray-500 mb-2">Patient</p>
+          {% include "partials/photo_field.html" with errors=form.photo.errors %}
+        </div>
+      </div>
+      <hr class="border-gray-100" />
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Full Name</label>
+          <input type="text" name="full_name" value="{{ form.full_name.value|default:'' }}" class="form-input" required />
+        </div>
+        <div>
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" value="{{ form.phone.value|default:'' }}" class="form-input" />
+        </div>
+        {% include "partials/select_field.html" with id="country" name="country" label="Country" choices=form.fields.country.choices selected=form.country.value errors=form.country.errors hint="You can only book with doctors in the same country." %}
+        <div>
+          <label class="form-label">Date of Birth</label>
+          <input type="date" name="date_of_birth" value="{{ form.date_of_birth.value|default:'' }}" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Address</label>
+          <input type="text" name="address" value="{{ form.address.value|default:'' }}" placeholder="Your address" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Emergency Contact Name</label>
+          <input type="text" name="emergency_contact_name" value="{{ form.emergency_contact_name.value|default:'' }}" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Emergency Contact Phone</label>
+          <input type="tel" name="emergency_contact_phone" value="{{ form.emergency_contact_phone.value|default:'' }}" class="form-input" />
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">
+        <i data-lucide="save" class="w-4 h-4"></i> Save Profile
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
