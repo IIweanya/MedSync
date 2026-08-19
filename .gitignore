@@ -1,0 +1,71 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Environment variables / secrets
+.env
+.env.*
+secrets.json
+secret_key.txt
+local_settings.py
+settings_local.py
+
+# Database files
+*.sqlite3
+*.sqlite3-journal
+
+# User uploads / media
+/media/
+
+# Static build output
+staticfiles/
+static_root/
+
+# Logs
+*.log
+
+# IDE/editor folders
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+wheelhouse/
+
+# Testing / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# SSH / keys / certificates
+*.pem
+*.key
+*.p12
+*.ppk
+id_rsa
+id_rsa.pub
+.aws/
+.aws/credentials
+.netrc
+
+# Misc
+coverage.xml
+
+# Txt files
+*.txt
