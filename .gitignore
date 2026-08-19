@@ -69,3 +69,5 @@ coverage.xml
 
 # Txt files
 *.txt
+
+db.sqlite3
