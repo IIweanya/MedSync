@@ -9,13 +9,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Kept as a fallback so an existing checkout keeps working without a .env, but set
 # SECRET_KEY (and DEBUG=False) in the environment before deploying anywhere real.
 SECRET_KEY = os.getenv(
-    'SECRET_KEY',
-    'django-insecure-change-this-in-production-medsync-secret-key',
+    'SECRET_KEY'
 )
 
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', '*').split(',') if h.strip()]
+ALLOWED_HOSTS = [
+    h.strip() 
+    for h in os.getenv(
+        'ALLOWED_HOSTS', 
+        'localhost,127.0.0.1'
+    ).split(',') 
+    if h.strip()
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
